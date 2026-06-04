@@ -1,6 +1,7 @@
 package com.stacksimplify.restservices.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -18,70 +19,84 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.stacksimplify.restservices.entities.User;
 import com.stacksimplify.restservices.exceptions.UserExistsException;
+import com.stacksimplify.restservices.exceptions.UserNameNotFoundException;
 import com.stacksimplify.restservices.exceptions.UserNotFoundException;
 import com.stacksimplify.restservices.services.UserService;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 
 //Controller
 @RestController
 public class UserController {
 
+	// Autowire the UserService
 	@Autowired
 	private UserService userService;
-	
-	//getAllUSers
+
+	// getAllUsers Method
 	@GetMapping("/users")
-	public List<User> getAllUsers(){
+	public List<User> getAllUsers() {
+
 		return userService.getAllUsers();
-		
+
 	}
-	
+
+	// Create User Method
+	// @RequestBody Annotation
+	// @PostMapping Annotation
 	@PostMapping("/users")
-	public ResponseEntity<Void> createUser(@RequestBody User user, UriComponentsBuilder builder) {
+	public ResponseEntity<Void> createUser(@Valid @RequestBody User user, UriComponentsBuilder builder) {
 		try {
-			userService.createUSer(user);
+			userService.createUser(user);
 			HttpHeaders headers = new HttpHeaders();
-			headers.setLocation(builder.path("/users/{id}").
-					buildAndExpand(user.getId()).toUri());
-			return new ResponseEntity<Void>(headers,HttpStatus.CREATED);
-		} catch (UserExistsException e) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-		}			
+			headers.setLocation(builder.path("/users/{id}").buildAndExpand(user.getId()).toUri());
+			return new ResponseEntity<Void>(headers, HttpStatus.CREATED);
+			
+		} catch(UserExistsException ex) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+		}
 	}
-	
+
+	// getUserById
 	@GetMapping("/users/{id}")
-	public User getUserById(@PathVariable("id") Long id) {
-		
+	public Optional<User> getUserById(@PathVariable("id") @Min(1) Long id) {
+
 		try {
 			return userService.getUserById(id);
-		} catch (UserNotFoundException e) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+		} catch (UserNotFoundException ex) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
 		}
-			
+
 	}
-	
-	@PutMapping("/users/{id}/{lastName}")
-	public User updateUserBydId(@PathVariable("id") Long id,@PathVariable("lastName") String lastName) {
-		User user;
+
+	// updateUserById
+	@PutMapping("/users/{id}")
+	public User updateUserById(@PathVariable("id") Long id, @RequestBody User user) {
+
 		try {
-			user = userService.getUserById(id);
-		} catch (UserNotFoundException e) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+			return userService.updateUserById(id, user);
+		} catch (UserNotFoundException ex) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
 		}
-		return userService.updateUserById(lastName,user);
-			
+
+	}
+
+	// deleteUserById
+	@DeleteMapping("/users/{id}")
+	public void deleteUserById(@PathVariable("id") Long id) {
+		userService.deleteUserById(id);
+	}
+
+	// getUserByUsername
+	@GetMapping("/users/byusername/{username}")
+	public User getUserByUsername(@PathVariable("username") String username) throws UserNameNotFoundException {
+		User user =  userService.getUserByUsername(username);
+		if(user == null)
+			throw new UserNameNotFoundException("Username: '" + username + "' not found in User repository");
+		return user;
+	
 	}
 	
-	@DeleteMapping("/users/{id}")
-	public void updateUserBydId(@PathVariable("id") Long id) {
-		userService.deleteUserById(id);
-			
-	}
-
-	@GetMapping("/users/userName/{userName}")
-	public User updateUserBydId(@PathVariable("userName") String userName) {
-		return userService.getUserByUserName(userName);
-			
-	}
-
-
 }
+	

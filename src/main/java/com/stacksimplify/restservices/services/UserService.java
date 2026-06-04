@@ -15,55 +15,71 @@ import com.stacksimplify.restservices.repositories.UserRepository;
 
 @Service
 public class UserService {
-	
+
+	// Autowire the UserRepository
 	@Autowired
 	private UserRepository userRepository;
-	
-	public List<User> getAllUsers(){
-		
+
+	// getAllUsers Method
+	public List<User> getAllUsers() {
+
 		return userRepository.findAll();
+
 	}
 
-	public User createUSer(User users) throws UserExistsException {
-		if(userRepository.findByUserName(users.getUserName()) != null) {
-			throw new UserExistsException("User already exists");
-		}
-		return userRepository.save(users);
-			
-	}
+	// CreateUser Method
+	public User createUser(User user) throws UserExistsException{
+		//if user exist using username
+		User existingUser = userRepository.findByUserName(user.getUserName());
 	
-	public User getUserById(Long id) throws UserNotFoundException{
-		Optional<User> optionalUser = userRepository.findById(id);
-	    User user = null;
-		if(optionalUser.isEmpty()) {
-			throw new UserNotFoundException("No user is returned from the repository");
-		}else {
-			user = optionalUser.get();
+		//if not exists throw UserExistsException
+		if(existingUser != null) {
+			throw new UserExistsException("User already exists in repository");
 		}
 		
-		return user;			
-	}
-
-
-	public User updateUserById(String lastName, User user) {
-		user.setLastName(lastName);
+	
 		return userRepository.save(user);
 	}
-	
+
+	// getUserById
+	public Optional<User> getUserById(Long id) throws UserNotFoundException {
+		Optional<User> user = userRepository.findById(id);
+
+		if (!user.isPresent()) {
+			throw new UserNotFoundException("User Not found in user Repository");
+		}
+
+		return user;
+	}
+
+	// updateUserById
+	public User updateUserById(Long id, User user) throws UserNotFoundException {
+		Optional<User> optionalUser = userRepository.findById(id);
+
+		if (!optionalUser.isPresent()) {
+			throw new UserNotFoundException("User Not found in user Repository, provide the correct user id");
+		}
+
+		
+		user.setId(id);
+		return userRepository.save(user);
+
+	}
+
+	// deleteUserById
 	public void deleteUserById(Long id) {
 		Optional<User> optionalUser = userRepository.findById(id);
-		if(optionalUser.isEmpty()) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No user is returned from the repository");
-		}else {
-			userRepository.deleteById(id);
+		if (!optionalUser.isPresent()) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"User Not found in user Repository, provide the correct user id");
 		}
-	}
 	
-	public User getUserByUserName(String userName) {
-		
-		return userRepository.findByUserName(userName);
-			
+		userRepository.deleteById(id);
 	}
-	
+
+	// getUserByUsername
+
+	public User getUserByUsername(String username) {
+		return userRepository.findByUserName(username);
+	}
 
 }
