@@ -1,9 +1,12 @@
 package com.stacksimplify.restservices.entities;
 
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
@@ -36,6 +39,9 @@ public class User {
 	@Column(name = "SSN", length=50, nullable=false, unique=true)
 	private String ssn;
 
+	@OneToMany(mappedBy="user")
+	private List<Order> order;
+	
 	public User() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -112,6 +118,14 @@ public class User {
 	public String toString() {
 		return "User [id=" + id + ", userName=" + userName + ", firstName=" + firstName + ", lastName=" + lastName
 				+ ", email=" + email + ", role=" + role + ", ssn=" + ssn + "]";
+	}
+
+	public List<Order> getOrder() {
+		return order;
+	}
+
+	public void setOrder(List<Order> order) {
+		this.order = order;
 	}
 	
 	
