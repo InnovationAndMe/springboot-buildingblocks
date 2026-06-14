@@ -9,10 +9,21 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.FetchType;
 
+import org.springframework.hateoas.RepresentationModel;
+
 @Entity
 @Table(name = "orders")
-public class Order {
-	
+public class Order  extends RepresentationModel<Order> { //ResourceSupport deprecated now 
+/*
+ * 	New classes 
+ResourceSupport → RepresentationModel
+
+Resource → EntityModel
+
+Resources → CollectionModel
+
+PagedResources → PagedModel  
+*/	
 	@Id
 	@GeneratedValue
 	private Long orderId;
