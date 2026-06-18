@@ -1,6 +1,7 @@
 package com.stacksimplify.restservices.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,7 +27,9 @@ PagedResources → PagedModel
 */	
 	@Id
 	@GeneratedValue
+	@JsonView(Views.Internal.class)
 	private Long orderId;
+	@JsonView(Views.Internal.class)
 	private String orderDescription;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
