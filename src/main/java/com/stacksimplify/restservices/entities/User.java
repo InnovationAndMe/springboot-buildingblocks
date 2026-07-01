@@ -60,12 +60,19 @@ public class User extends RepresentationModel<User> { //ResourceSupport deprecat
 	@JsonView(Views.Internal.class)
 	private List<Order> order;
 	
+	@Column(name = "ADDRESS")
+	private String address;
+	
 	public User() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public User(Long id, String userName, String firstName, String lastName, String email, String role, String ssn) {
+	
+
+	public User(Long id, @NotEmpty(message = "Username is mandatory field. Please provide username") String userName,
+			@Size(min = 2, message = "Firstname should have atleast 2 characters") String firstName, String lastName,
+			String email, String role, String ssn, List<Order> order, String address) {
 		super();
 		this.id = id;
 		this.userName = userName;
@@ -74,7 +81,11 @@ public class User extends RepresentationModel<User> { //ResourceSupport deprecat
 		this.email = email;
 		this.role = role;
 		this.ssn = ssn;
+		this.order = order;
+		this.address = address;
 	}
+
+
 
 	public Long getId() {
 		return id;
@@ -144,6 +155,18 @@ public class User extends RepresentationModel<User> { //ResourceSupport deprecat
 
 	public void setOrder(List<Order> order) {
 		this.order = order;
+	}
+
+
+
+	public String getAddress() {
+		return address;
+	}
+
+
+
+	public void setAddress(String address) {
+		this.address = address;
 	}
 	
 	
