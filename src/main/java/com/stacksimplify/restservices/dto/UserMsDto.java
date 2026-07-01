@@ -46,15 +46,19 @@ public class UserMsDto {
 
 
 
-	public String getEmail() {
+	public String getEmailAddress() {
 		return emailAddress;
 	}
 
 
 
-	public void setEmail(String email) {
-		this.emailAddress = email;
+	public void setEmailAddress(String emailAddress) {
+		this.emailAddress = emailAddress;
 	}
+
+
+
+	
 
 	
 	
